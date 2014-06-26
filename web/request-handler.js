@@ -19,7 +19,7 @@ exports.handleRequest = function (req, res) {
   }
 
   // connectClient at base URL
-  var connectClient = function() {
+  var handleClient = function() {
     if (req.method === "GET") {
       serveSearchPage();
     }
@@ -42,6 +42,13 @@ exports.handleRequest = function (req, res) {
     res.end(html);
   };
 
+  // serve HTML for loading page
+  var serveLoadingPage = function() {
+    var html = fs.readFileSync(archive.paths.siteAssets + '/loading.html', { encoding: 'utf8'} );
+    res.writeHead(200, {'Content-Type': 'text/html','Content-Length':html.length});
+    res.end(html);
+  };
+
   // serve CSS for search page
   var serveCSS = function() {
     var css = fs.readFileSync(archive.paths.siteAssets + '/styles.css', { encoding: 'utf8'} );
@@ -51,27 +58,33 @@ exports.handleRequest = function (req, res) {
 
   // POST from form should return data    data.url = "someURL"
   var processSearchURL = function() {
-    console.log("processing");
+    // listen for form data
     req.addListener("data", function(buffer) {
       // example stringified response: url=test.com
-      // should format url and/or check for errors
       var url = buffer.toString('utf8').split("=")[1];
+      // should check if url is valid!
       if (archive.isUrlInList(url)) {
         // check if the file is in the archive
-        // if it is not, wait a few seconds, then serve it
+        if ( archive.isUrlArchived('/'+url) ) {
+          headers['Location'] = '/'+url;
+          res.writeHead(302, headers);
+          res.end();
+          delete headers['Location'];
+        } else {
+          serveLoadingPage();
+        }
       } else {
+      // if not in list, add to list and go to loading page
         archive.addUrlToList(url);
+        serveLoadingPage();
       }
+
     });
-    // temporary
-    var html = fs.readFileSync(archive.paths.siteAssets + '/index.html', { encoding: 'utf8'} );
-    res.writeHead(302, {'Content-Type': 'text/html','Content-Length':html.length});
-    res.end(html);
   };
 
   // setup a router for request urls
   var router = {
-    '/': connectClient,
+    '/': handleClient,
     '/styles.css': serveCSS,
     '/historical': processSearchURL
   };
