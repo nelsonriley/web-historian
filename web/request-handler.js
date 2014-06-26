@@ -28,6 +28,13 @@ exports.handleRequest = function (req, res) {
     }
   };
 
+  // serve an archived page with GET request at  /site.com
+  var serveArchivedSite = function() {
+    var html = fs.readFileSync(archive.paths.archivedSites + req.url, { encoding: 'utf8'} );
+    res.writeHead(200, {'Content-Type': 'text/html','Content-Length':html.length});
+    res.end(html);
+  };
+
   // serve HTML for search page
   var serveSearchPage = function() {
     var html = fs.readFileSync(archive.paths.siteAssets + '/index.html', { encoding: 'utf8'} );
@@ -51,7 +58,7 @@ exports.handleRequest = function (req, res) {
       var url = buffer.toString('utf8').split("=")[1];
       if (archive.isUrlInList(url)) {
         // check if the file is in the archive
-        // if it is not, wait a few seconds and load
+        // if it is not, wait a few seconds, then serve it
       } else {
         archive.addUrlToList(url);
       }
@@ -71,6 +78,8 @@ exports.handleRequest = function (req, res) {
 
   if (router[req.url]) {
     router[req.url]();
+  } else if (archive.isUrlArchived(req.url)) {
+    serveArchivedSite();
   } else {
     res.writeHead(404, headers);
     res.end('Page Not Found 404');

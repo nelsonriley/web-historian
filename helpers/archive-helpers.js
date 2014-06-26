@@ -43,8 +43,13 @@ exports.addUrlToList = function(url){
   fs.appendFileSync(exports.paths.list, url + '\n', {encoding: 'utf8'});
 };
 
-exports.isURLArchived = function(){
+exports.isUrlArchived = function(rawurl){
+  // remove leading '/''
+  // url = rawurl.slice(1);
+  // does file exist in directory?
+  return fs.existsSync(exports.paths.archivedSites + rawurl);
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(url){
+  var httpAddress = 'http://' + url; // watch regex
 };
