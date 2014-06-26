@@ -16,3 +16,7 @@ exports.serveAssets = function(res, asset) {
 };
 
 // As you progress, keep thinking about what helper functions you can put here!
+
+exports.isValidURL = function(url) {
+  //if (url.contains("http:"))
+};

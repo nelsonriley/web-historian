@@ -1,5 +1,6 @@
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
+var http = require('./http-helpers');
 var fs = require('node-fs');
 // require more modules/folders here!
 
@@ -8,8 +9,7 @@ exports.handleRequest = function (req, res) {
   // helpful logging
   console.log("Serving request type " + req.method + " for url " + req.url);
   // default response code and headers
-  var headers = defaultCorsHeaders;
-  headers["Content-Type"] = "text/plain";
+  var headers = http.headers;
   var statusCode = 200;
 
   // handle CORS
@@ -32,10 +32,22 @@ exports.handleRequest = function (req, res) {
     res.end(css);
   };
 
+  // POST from form should return data    data.url = "someURL"
+  var processSearchURL = function() {
+    console.log("processing");
+    req.addListener("data", function(buffer) {
+      // ie url=test.com
+      console.log(buffer.toString('utf8'));
+    });
+    // temporary, maybe
+    serveSearchPage();
+  };
+
   // setup a router for request urls
   var router = {
     '/': serveSearchPage,
-    '/styles.css': serveCSS
+    '/styles.css': serveCSS,
+    '/historical': processSearchURL
   };
 
   if (router[req.url]) {
@@ -45,11 +57,4 @@ exports.handleRequest = function (req, res) {
     res.end('Page Not Found 404');
   }
 
-};
-
-var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
 };
