@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -48,12 +49,28 @@ exports.isUrlArchived = function(url){
   return fs.existsSync(exports.paths.archivedSites + url);
 };
 
-exports.downloadUrls = function(url){
-  var httpAddress = 'http://' + url; // watch regex on '//'
-  // download function
-  // start a connection with http.request   (or request module)
-  // parse the chunked data response
-  // check if directory exists
-  // if yes write to it
-  // if not create it and pass data
+exports.downloadUrls = function(urls){
+  // var httpAddress = 'http://' + url; // watch regex on '//'
+  for (var u = 0; u < urls.length; u++) {
+    var options = {
+      host: urls[u],
+      port: 80,
+      path: '/'
+    };
+    http.get(options, function(resp){
+      resp.on('data', function(chunk){
+        var html = chunk.toString('utf8');
+        console.log(html);
+        // error   urls[u is undefined]
+        exports.writeFileToDir(urls[u], html, exports.paths.archivedSites);
+      });
+    }).on('error', function(e){
+      console.log("HTTP GET Error: ", e.message);
+    });
+  }
 };
+
+exports.writeFileToDir = function(name, data, directory) {
+  fs.writeFileSync(directory+'/'+'dog.dog', data);
+  // if (!exports.isUrlArchived(urls[u])) {
+}

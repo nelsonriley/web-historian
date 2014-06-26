@@ -3,20 +3,7 @@
 
 var archive = require('../helpers/archive-helpers');
 
+// **test by running this js file from the command line
 
-// fetch and archive html
-
-// get list url names
-// for each
-// call download function
-
-// download function
-// start a connection with http.request   (or request module)
-// parse the chunked data response
-// check if directory exists
-// if yes write to it
-// if not create it and pass data
-
-
-
-// test by running this js file from the command line
+// fetch urls, dowload/archive each
+archive.readListOfUrls(archive.downloadUrls);
