@@ -18,6 +18,16 @@ exports.handleRequest = function (req, res) {
     res.end('CORS');
   }
 
+  // connectClient at base URL
+  var connectClient = function() {
+    if (req.method === "GET") {
+      serveSearchPage();
+    }
+    if (req.method === "POST") {
+      processSearchURL();
+    }
+  };
+
   // serve HTML for search page
   var serveSearchPage = function() {
     var html = fs.readFileSync(archive.paths.siteAssets + '/index.html', { encoding: 'utf8'} );
@@ -36,16 +46,25 @@ exports.handleRequest = function (req, res) {
   var processSearchURL = function() {
     console.log("processing");
     req.addListener("data", function(buffer) {
-      // ie url=test.com
-      console.log(buffer.toString('utf8'));
+      // example stringified response: url=test.com
+      // should format url and/or check for errors
+      var url = buffer.toString('utf8').split("=")[1];
+      if (archive.isUrlInList(url)) {
+        // check if the file is in the archive
+        // if it is not, wait a few seconds and load
+      } else {
+        archive.addUrlToList(url);
+      }
     });
-    // temporary, maybe
-    serveSearchPage();
+    // temporary
+    var html = fs.readFileSync(archive.paths.siteAssets + '/index.html', { encoding: 'utf8'} );
+    res.writeHead(302, {'Content-Type': 'text/html','Content-Length':html.length});
+    res.end(html);
   };
 
   // setup a router for request urls
   var router = {
-    '/': serveSearchPage,
+    '/': connectClient,
     '/styles.css': serveCSS,
     '/historical': processSearchURL
   };

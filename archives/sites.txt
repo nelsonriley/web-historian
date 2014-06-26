@@ -1,1 +1,6 @@
 www.google.com
+www.bing.com
+goog.com
+nuub.com
+guub.com
+test
