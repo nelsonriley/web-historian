@@ -50,7 +50,6 @@ exports.isUrlArchived = function(url){
 };
 
 exports.downloadUrls = function(urls){
-  // var httpAddress = 'http://' + url; // watch regex on '//'
   for (var u = 0; u < urls.length; u++) {
     var options = {
       host: urls[u],
@@ -59,10 +58,9 @@ exports.downloadUrls = function(urls){
     };
     http.get(options, function(resp){
       resp.on('data', function(chunk){
+        var url = this.req._headers.host;
         var html = chunk.toString('utf8');
-        console.log(html);
-        // error   urls[u is undefined]
-        exports.writeFileToDir(urls[u], html, exports.paths.archivedSites);
+        exports.writeSiteToFile(url, html);
       });
     }).on('error', function(e){
       console.log("HTTP GET Error: ", e.message);
@@ -70,7 +68,7 @@ exports.downloadUrls = function(urls){
   }
 };
 
-exports.writeFileToDir = function(name, data, directory) {
-  fs.writeFileSync(directory+'/'+'dog.dog', data);
-  // if (!exports.isUrlArchived(urls[u])) {
-}
+exports.writeSiteToFile = function(url, html) {
+  var directory = exports.paths.archivedSites;
+  fs.writeFileSync(directory+'/'+url, html);
+};
