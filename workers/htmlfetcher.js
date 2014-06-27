@@ -1,13 +1,17 @@
-// eventually, you'll have some code here that uses the code in `archive-helpers.js`
-// to actually download the urls you want to download.
+// scrapes web pages corresponding to entries in url list
+// saves files containing html to an archive folder
 
 var archive = require('../helpers/archive-helpers');
 
-// **test by running this js file from the command line
-
-// fetch urls, dowload/archive each
 archive.readListOfUrls(archive.downloadUrls);
 
+
+
+
+
+
+
+// Chron Job Set Up in OS X
 
 // setting up chron job in 5 minutes
 // crontab -e    // to create a new crontab file

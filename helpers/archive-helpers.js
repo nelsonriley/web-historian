@@ -32,6 +32,13 @@ exports.readListOfUrls = function(fun){
   fun(urls);
 };
 
+exports.isUrlValid = function(url){
+  if (url.indexOf('.com') > -1 || url.indexOf('.net') > -1) {
+    return true;
+  }
+  return false;
+};
+
 exports.isUrlInList = function(url){
   var list = fs.readFileSync(exports.paths.list, { encoding: 'utf8'} );
   if (list.indexOf(url) > -1) {
@@ -45,7 +52,6 @@ exports.addUrlToList = function(url){
 };
 
 exports.isUrlArchived = function(url){
-  // does file exist in directory?
   return fs.existsSync(exports.paths.archivedSites + url);
 };
 
